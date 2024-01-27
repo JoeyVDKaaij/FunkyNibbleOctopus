@@ -1,5 +1,4 @@
 ﻿using System;
-using Game.Waves;
 using UnityEngine;
 using Zenject;
 
@@ -13,9 +12,6 @@ namespace Game.Plates
 
         [SerializeField, Min(0)]
         private int platesCount;
-
-        [Inject]
-        private WavesController _wavesController;
 
         public object[] CurrentPlates { get; private set; }
 
@@ -59,34 +55,10 @@ namespace Game.Plates
                     break;
                 }
             }
-            if (allPlatesConsumed) {
+            if (allPlatesConsumed)
                 OnAllPlatesConsumed?.Invoke();
-                _wavesController.NextWave();
-            }
 
             return true;
-        }
-
-        private void Update ()
-        {
-#if UNITY_EDITOR
-            if (Input.GetKeyDown(KeyCode.C)) {
-                if (CurrentPlates == null || CurrentPlates.Length == 0)
-                    RenewPlates();
-
-                object plate = null;
-                for (int i = 0; i < CurrentPlates.Length; i++) {
-                    if (CurrentPlates[i] != null) {
-                        plate = CurrentPlates[i];
-                        break;
-                    }
-                }
-                if (plate != null)
-                    ConsumePlate(plate);
-                else
-                    RenewPlates();
-            }
-#endif
         }
     }
 }
