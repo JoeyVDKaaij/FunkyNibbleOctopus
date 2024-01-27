@@ -1,4 +1,3 @@
-using System;
 using Game.Scenes;
 using UnityEngine;
 using Zenject;
@@ -16,27 +15,27 @@ namespace Game
 
         [Header("Score")]
         [SerializeField]
-        private int highscore;
-
-        [Inject]
-        private ScenesController _scenesController;
-
-        public int Highscore
+        private float highscore;
+        public float Highscore
         {
             get => highscore;
-            set {
+            private set {
                 if (value > highscore)
                     highscore = value;
             }
         }
+
+        [Inject]
+        private ScenesController _scenesController;
 
         public override void InstallBindings ()
         {
             Container.Bind<GameManager>().FromInstance(this).AsSingle().NonLazy();
         }
 
-        public void FinishGame ()
+        public void FinishGame (float score)
         {
+            Highscore = score;
             _scenesController.LoadScene(mainMenuScene).Forget();
         }
 
@@ -44,7 +43,7 @@ namespace Game
         {
 #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Backspace))
-                FinishGame();
+                FinishGame(0);
 #endif
         }
     }
