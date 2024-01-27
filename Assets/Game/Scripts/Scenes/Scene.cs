@@ -38,17 +38,19 @@ namespace Game.Scenes
 
         public static bool operator ==(Scene a, Scene b)
         {
-            if (a is null)
-                return b is null;
-            if (b is null)
+            if (a is null && b is null)
+                return true;
+            if (a is null || b is null)
                 return false;
 
-            if (a.MainScene != b.MainScene)
+            if (a.MainScene.BuildIndex != b.MainScene.BuildIndex)
                 return false;
 
+            if (a._otherScenes.Count != b._otherScenes.Count)
+                return false;
             for (int i = 0; i < a._otherScenes.Count; i++) {
                 SceneReference otherScene = a._otherScenes[i];
-                if (!b._otherScenes.Contains(otherScene))
+                if (a._otherScenes[i].BuildIndex != b._otherScenes[i].BuildIndex)
                     return false;
             }
 
