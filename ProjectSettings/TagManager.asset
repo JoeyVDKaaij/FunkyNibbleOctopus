@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Dish
+  - Table
   layers:
   - Default
   - TransparentFX
