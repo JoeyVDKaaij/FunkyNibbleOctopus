@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -6,14 +7,24 @@ namespace Game.Plates
 {
     public class PlatesController : MonoInstaller
     {
-        public Action<object> OnPlateConsumed;
+        private static readonly PlateType[] PlateTypes = (PlateType[])Enum.GetValues(typeof(PlateType));
 
-        public Action OnAllPlatesConsumed;
+        public event Action<PlateController> OnPlateConsumed;
+
+        public event Action OnAllPlatesConsumed;
+
+        public delegate PlateController PlateSpawner (DiContainer container, PlateType type);
+
+        public event PlateSpawner SpawnPlate;
+
+        [SerializeField]
+        private PlateController plateTemplate;
 
         [SerializeField, Min(0)]
         private int platesCount;
+        public int PlatesCount => platesCount;
 
-        public object[] CurrentPlates { get; private set; }
+        public List<PlateController> CurrentPlates { get; private set; }
 
         public override void InstallBindings ()
         {
@@ -22,40 +33,52 @@ namespace Game.Plates
 
         public void RenewPlates ()
         {
-            CurrentPlates = new object[platesCount];
-            for (int i = 0; i < CurrentPlates.Length; i++)
-                CurrentPlates[i] = new object();
+            if (CurrentPlates == null)
+                CurrentPlates = new List<PlateController>(platesCount);
+
+            for (int i = 0; i < CurrentPlates.Count; i++)
+                if (CurrentPlates[i] != null)
+                    Destroy(CurrentPlates[i].gameObject);
+
+            CurrentPlates.Clear();
+            for (int i = 0; i < platesCount; i++) {
+                var plate = SpawnPlate?.Invoke(Container, PlateTypes[UnityEngine.Random.Range(0, PlateTypes.Length)]);
+                if (plate == null)
+                    CurrentPlates.Add(plate);
+            }
         }
 
-        public bool IsPlateConsumed (object plate)
+        public bool IsPlateConsumed (PlateController plate)
         {
-            if (plate == null || CurrentPlates == null || CurrentPlates.Length == 0)
+            if (plate == null || CurrentPlates == null || CurrentPlates.Count == 0)
                 return false;
 
-            return Array.IndexOf(CurrentPlates, plate) >= 0;
+            return CurrentPlates.Contains(plate);
         }
 
-        public bool ConsumePlate (object plate)
+        public void RegisterPlate (PlateController plate)
         {
-            if (plate == null || CurrentPlates == null || CurrentPlates.Length == 0)
+            if (plate == null)
+                return;
+
+            CurrentPlates ??= new List<PlateController>(platesCount);
+
+            CurrentPlates.Add(plate);
+        }
+
+        public bool ConsumePlate (PlateController plate)
+        {
+            if (plate == null || CurrentPlates == null || CurrentPlates.Count == 0)
                 return false;
 
-            var index = Array.IndexOf(CurrentPlates, plate);
+            var index = CurrentPlates.IndexOf(plate);
             if (index < 0)
                 return false;
 
-            CurrentPlates[index] = null;
+            CurrentPlates.RemoveAt(index);
 
             OnPlateConsumed?.Invoke(plate);
-
-            bool allPlatesConsumed = true;
-            for (int i = 0; i < CurrentPlates.Length; i++) {
-                if (CurrentPlates[i] != null) {
-                    allPlatesConsumed = false;
-                    break;
-                }
-            }
-            if (allPlatesConsumed)
+            if (CurrentPlates.Count == 0)
                 OnAllPlatesConsumed?.Invoke();
 
             return true;

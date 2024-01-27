@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Game.Plates;
+using UnityEngine;
 using Zenject;
 
 namespace Game
@@ -12,7 +13,7 @@ namespace Game
         private Waves.WavesController _wavesController;
 
         [Inject]
-        private Plates.PlatesController _platesController;
+        private PlatesController _platesController;
 
         [SerializeField]
         private float score;
@@ -28,8 +29,10 @@ namespace Game
             Container.Bind<GameStateController>().FromInstance(this).AsSingle().NonLazy();
         }
 
-        private void Start ()
+        public override void Start ()
         {
+            base.Start();
+
             _platesController.RenewPlates();
         }
 
@@ -44,8 +47,8 @@ namespace Game
         {
 #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.C)) {
-                object plate = null;
-                for (int i = 0; i < _platesController.CurrentPlates.Length; i++) {
+                PlateController plate = null;
+                for (int i = 0; i < _platesController.CurrentPlates.Count; i++) {
                     if (_platesController.CurrentPlates[i] != null) {
                         plate = _platesController.CurrentPlates[i];
                         break;
@@ -65,7 +68,7 @@ namespace Game
             _gameManager.FinishGame(score);
         }
 
-        private void OnPlateConsumed_AddScore (object plate)
+        private void OnPlateConsumed_AddScore (PlateController plate)
         {
             // TODO: add proper score calculation
             score += 100;
