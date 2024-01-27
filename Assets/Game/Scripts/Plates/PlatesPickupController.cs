@@ -18,16 +18,22 @@ namespace Game.Plates
             _plateSpawnPoints = plateSpawnPoints;
         }
 
-        public bool IsItemAvailable (Vector3 position)
+        public bool IsItemAvailable (object requester)
         {
-            (_, bool found) = GetClosestSpawnPoint(position);
+            if (requester is not MonoBehaviour behaviour)
+                return false;
+
+            (_, bool found) = GetClosestSpawnPoint(behaviour.transform.position);
 
             return found;
         }
 
-        public IItem GetItem (Vector3 position)
+        public IItem GetItem (object requester)
         {
-            return GivePlate(position);
+            if (requester is MonoBehaviour behaviour)
+                return GivePlate(behaviour.transform.position);
+
+            return null;
         }
 
         public PlateController GivePlate (Vector3 position)
@@ -42,20 +48,20 @@ namespace Game.Plates
             return plate;
         }
 
-        public bool IsItemAcceptable (Vector3 position, IItem item)
+        public bool IsItemAcceptable (object requester, IItem item)
         {
-            if (item is not PlateController)
+            if (item is not PlateController || requester is not MonoBehaviour behaviour)
                 return false;
 
-            (_, bool found) = GetClosestFreeSpawnPoint(position);
+            (_, bool found) = GetClosestFreeSpawnPoint(behaviour.transform.position);
 
             return found;
         }
 
-        public bool AcceptItem (Vector3 position, IItem item)
+        public bool AcceptItem (object requester, IItem item)
         {
-            if (item is PlateController plate)
-                return AcceptPlate(position, plate);
+            if (item is PlateController plate && requester is MonoBehaviour behaviour)
+                return AcceptPlate(behaviour.transform.position, plate);
 
             return false;
         }

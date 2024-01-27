@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-
-namespace Game.Items
+﻿namespace Game.Items
 {
     public interface IItemAcceptor
     {
-        public bool IsItemAcceptable (Vector3 position, IItem item);
-        public bool AcceptItem (Vector3 position, IItem item);
+        public bool IsItemAcceptable (object requester, IItem item);
+        public bool AcceptItem (object requester, IItem item);
     }
 }

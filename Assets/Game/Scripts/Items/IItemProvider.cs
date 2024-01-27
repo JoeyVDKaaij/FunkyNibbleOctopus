@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-
-namespace Game.Items
+﻿namespace Game.Items
 {
     public interface IItemProvider
     {
-        public bool IsItemAvailable (Vector3 position);
-        public IItem GetItem (Vector3 position);
+        public bool IsItemAvailable (object requester);
+        public IItem GetItem (object requester);
     }
 }
