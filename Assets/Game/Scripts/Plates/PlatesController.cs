@@ -17,9 +17,6 @@ namespace Game.Plates
 
         public event PlateSpawner SpawnPlate;
 
-        [SerializeField]
-        private PlateController plateTemplate;
-
         [SerializeField, Min(0)]
         private int platesCount;
         public int PlatesCount => platesCount;
