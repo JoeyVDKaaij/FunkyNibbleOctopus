@@ -1,42 +1,51 @@
 using System;
+using Game.Scenes;
 using UnityEngine;
+using Zenject;
 
-public class GameManager : MonoBehaviour
+namespace Game
 {
-    public static GameManager instance { get; private set; }
-    
-    
-    private void Awake()
+    public class GameManager : MonoInstaller
     {
-        if (instance == null)
-        {
-            instance = this;
-            if (transform.parent.gameObject != null) DontDestroyOnLoad(transform.parent.gameObject);
-            else DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+        [Header("Scenes")]
+        [SerializeField]
+        private SceneContainer mainMenuScene;
 
-    private void OnDisable()
-    {
-        if (instance == this)
+        [SerializeField]
+        private SceneContainer gameScene;
+
+        [Header("Score")]
+        [SerializeField]
+        private int highscore;
+
+        [Inject]
+        private ScenesController _scenesController;
+
+        public int Highscore
         {
-            instance = null;
+            get => highscore;
+            set {
+                if (value > highscore)
+                    highscore = value;
+            }
         }
-    }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+        public override void InstallBindings ()
+        {
+            Container.Bind<GameManager>().FromInstance(this).AsSingle().NonLazy();
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void FinishGame ()
+        {
+            _scenesController.LoadScene(mainMenuScene).Forget();
+        }
+
+        private void Update ()
+        {
+#if UNITY_EDITOR
+            if (Input.GetKeyDown(KeyCode.Backspace))
+                FinishGame();
+#endif
+        }
     }
 }
