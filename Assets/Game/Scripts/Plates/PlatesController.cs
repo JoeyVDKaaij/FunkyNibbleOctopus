@@ -78,6 +78,8 @@ namespace Game.Plates
             if (CurrentPlates.Count == 0)
                 OnAllPlatesConsumed?.Invoke();
 
+            Destroy(plate.gameObject);
+
             return true;
         }
     }
