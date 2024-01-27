@@ -53,13 +53,13 @@ namespace Game
                 return;
 
             if (_currentItem == null && other.TryGetComponent<IItemProvider>(out var itemProvider)) {
-                var item = itemProvider.GetItem(transform.position);
+                var item = itemProvider.GetItem(this);
                 if (item != null)
                     HoldItem(item);
             } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
-                if (itemAcceptor.IsItemAcceptable(transform.position, _currentItem))
+                if (itemAcceptor.IsItemAcceptable(this, _currentItem))
                 {
-                    _ = itemAcceptor.AcceptItem(transform.position, _currentItem);
+                    _ = itemAcceptor.AcceptItem(this, _currentItem);
                     _currentItem = null;
                 }
             }
