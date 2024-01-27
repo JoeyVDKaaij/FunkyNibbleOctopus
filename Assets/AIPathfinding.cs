@@ -1,8 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Game.Items;
+using Game.Plates;
+using Zenject;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class AIPathfinding : MonoBehaviour
@@ -10,50 +12,68 @@ public class AIPathfinding : MonoBehaviour
     [Header("AI Pathfinding Settings")] [SerializeField, Tooltip("The tables that this GameObject has to pay attention to.")]
     private Transform[] tables = null;
     [SerializeField, Tooltip("The dishes that this GameObject has to pay attention to.")]
-    private Transform[] dishes = null;
+    private PlateController[] dishes = null;
 
-    private float focusDishId = 0;
+    private int focusDishId = 0;
+    private IItem _currentItem;
+    private bool _isItemInteractionRequested = true;
     private Transform _childObject;
     
     private NavMeshAgent agent = null;
+
+    
+    [Inject]
+    private PlatesController plate;
+    
     
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        focusDishId = Random.Range(0, dishes.Length);
+    }
+
+    private void Start()
+    {
+        dishes = plate.CurrentPlates.ToArray();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (agent != null && tables != null)
+        if (_currentItem == null)
         {
-            int focusedTableId = -1;
-            for (int i = 0; i < tables.Length; i++)
-            {
-                if (tables[i].transform.GetChild(0) != null && false) focusedTableId = i;
-            }
-            
-            if (dishes != null && _childObject == null)
-            {
-                agent.SetDestination(tables[focusedTableId].position);
-            }
-            else if (_childObject != null && focusedTableId >= 0)
-            {
-                agent.SetDestination(tables[focusedTableId].position);
-            }
-            
-            else Debug.LogError("Agent component is not active.");
+            agent.SetDestination(dishes[focusDishId].transform.position);
         }
-        else Debug.LogError("Cannot find tables.");
+        else
+        {
+            agent.SetDestination(tables[0].transform.position);
+        }
     }
 
-    private void OnCollisionStay(Collision other)
-    {
-        if (other.transform.CompareTag("Dish"))
+    
+    private void OnTriggerStay (Collider other)
         {
-            other.transform.SetParent(transform);
-            _childObject = other.transform;
-            _childObject.localPosition = new Vector3(0, 1.2f, 0);
+            if (!_isItemInteractionRequested) 
+                return;
+            
+            if (_currentItem == null && other.TryGetComponent<IItemProvider>(out var itemProvider)) {
+                var item = itemProvider.GetItem(transform.position);
+                if (item != null)
+                    HoldItem(item);
+            } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
+                if (itemAcceptor.IsItemAcceptable(transform.position, _currentItem))
+                {
+                    _ = itemAcceptor.AcceptItem(transform.position, _currentItem);
+                    _currentItem = null;
+                }
+            }
+
+            _isItemInteractionRequested = false;
         }
-    }
+
+        private void HoldItem (IItem item)
+        {
+            _currentItem = item;
+            _currentItem.SetParent(transform, new Vector3(0, 1.2f, 0));
+        }
 }
