@@ -6,14 +6,18 @@ namespace Game.Plates
 {
     public class PlateController : MonoBehaviour, IItem
     {
+        [SerializeField]
+        private SpriteRenderer spriteRenderer;
+
         [Inject]
-        private PlatesController _platesController;
+        private PlatesRepository _platesRepository;
 
         public Plate Plate { get; private set; }
 
-        public void SetType (PlateType type)
+        public void SetType (string type)
         {
             Plate = Plate.Create(type);
+            spriteRenderer.sprite = _platesRepository.GetByType(type).Sprite;
         }
 
         public void SetParent (Transform parent, Vector3 offset)

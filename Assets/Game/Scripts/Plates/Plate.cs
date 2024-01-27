@@ -5,13 +5,13 @@ namespace Game.Plates
 {
     public struct Plate
     {
-        public static readonly Plate Invalid = new (0, PlateType.Invalid);
-        public static Plate Create(PlateType type) => new (UnityEngine.Random.Range(1, int.MaxValue), type);
+        public static readonly Plate Invalid = new (0, "");
+        public static Plate Create(string type) => new (UnityEngine.Random.Range(1, int.MaxValue), type);
 
         public readonly int ID;
-        public readonly PlateType Type;
+        public readonly string Type;
 
-        private Plate (int id, PlateType type)
+        private Plate (int id, string type)
         {
             ID = id;
             Type = type;
@@ -39,7 +39,7 @@ namespace Game.Plates
 
         public override int GetHashCode ()
         {
-            return HashCode.Combine(ID, (int)Type);
+            return HashCode.Combine(ID, Type);
         }
     }
 }

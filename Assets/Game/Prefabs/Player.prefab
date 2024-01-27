@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 6362973566164232614}
   - component: {fileID: 5112385596662795867}
   - component: {fileID: 2667880004046376421}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Main Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1728868797412634665}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.4617483, y: 0, z: 0, w: -0.887011}
-  m_LocalPosition: {x: 0, y: 8.304, z: -5.465}
+  m_LocalRotation: {x: -0.2164393, y: -0, z: -0, w: -0.9762961}
+  m_LocalPosition: {x: 0, y: 22.142847, z: -45.11936}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1996119306688986862}
-  m_LocalEulerAnglesHint: {x: 415, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 385, y: 0, z: 0}
 --- !u!20 &6362973566164232614
 Camera:
   m_ObjectHideFlags: 0
@@ -67,7 +67,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 10
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -116,7 +116,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0

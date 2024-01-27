@@ -7,13 +7,11 @@ namespace Game.Plates
 {
     public class PlatesController : MonoInstaller
     {
-        private static readonly PlateType[] PlateTypes = (PlateType[])Enum.GetValues(typeof(PlateType));
-
         public event Action<PlateController> OnPlateConsumed;
 
         public event Action OnAllPlatesConsumed;
 
-        public delegate PlateController PlateSpawner (DiContainer container, PlateType type);
+        public delegate PlateController PlateSpawner (DiContainer container, string type);
 
         public event PlateSpawner SpawnPlate;
 
@@ -22,6 +20,9 @@ namespace Game.Plates
         public int PlatesCount => platesCount;
 
         public List<PlateController> CurrentPlates { get; private set; }
+
+        [Inject]
+        private PlatesRepository _platesRepository;
 
         public override void InstallBindings ()
         {
@@ -39,7 +40,8 @@ namespace Game.Plates
 
             CurrentPlates.Clear();
             for (int i = 0; i < platesCount; i++) {
-                var plate = SpawnPlate?.Invoke(Container, PlateTypes[UnityEngine.Random.Range(0, PlateTypes.Length)]);
+                string type = _platesRepository.PlateContainers[UnityEngine.Random.Range(0, _platesRepository.PlateContainers.Length)].Type;
+                var plate = SpawnPlate?.Invoke(Container, type);
                 if (plate == null)
                     CurrentPlates.Add(plate);
             }

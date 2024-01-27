@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7898078436586263868}
+  - component: {fileID: 5884419116557263748}
+  - component: {fileID: 2220875063665427024}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -34,6 +36,38 @@ Transform:
   - {fileID: 1058910901821118433}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5884419116557263748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917637884772321901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08eca9f7688a0a24685b89133b020c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _scriptableObjectInstallers: []
+  _monoInstallers:
+  - {fileID: 2220875063665427024}
+  _installerPrefabs: []
+  _findSiblingMonoInstallers: 0
+  _autoRun: 1
+  _kernel: {fileID: 0}
+--- !u!114 &2220875063665427024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917637884772321901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfdcf32f73f24298bc0e94f83dac9c18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 5040147661394449783}
 --- !u!1 &3223380767758020670
 GameObject:
   m_ObjectHideFlags: 0
@@ -195,6 +229,12 @@ PrefabInstance:
 --- !u!4 &435796691094536767 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1996119306688986862, guid: 4c0d444f451666f4cab0d39e42d5fa72,
+    type: 3}
+  m_PrefabInstance: {fileID: 2143679504911301841}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &5040147661394449783 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 6362973566164232614, guid: 4c0d444f451666f4cab0d39e42d5fa72,
     type: 3}
   m_PrefabInstance: {fileID: 2143679504911301841}
   m_PrefabAsset: {fileID: 0}
@@ -482,6 +522,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7898078436586263868}
     m_Modifications:
+    - target: {fileID: 334262203661659703, guid: c4cfa417b75a6a84ab7deaac1ee36b49,
+        type: 3}
+      propertyPath: cameraInstaller
+      value: 
+      objectReference: {fileID: 2220875063665427024}
+    - target: {fileID: 4283997555874643312, guid: c4cfa417b75a6a84ab7deaac1ee36b49,
+        type: 3}
+      propertyPath: _monoInstallers.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4283997555874643312, guid: c4cfa417b75a6a84ab7deaac1ee36b49,
+        type: 3}
+      propertyPath: _monoInstallers.Array.data[1]
+      value: 
+      objectReference: {fileID: 2220875063665427024}
     - target: {fileID: 6942163145946540167, guid: c4cfa417b75a6a84ab7deaac1ee36b49,
         type: 3}
       propertyPath: m_LocalPosition.x
