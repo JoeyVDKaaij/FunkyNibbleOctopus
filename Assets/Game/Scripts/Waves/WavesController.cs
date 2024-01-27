@@ -11,7 +11,7 @@ namespace Game.Waves
         [SerializeField]
         private int maximumWaveCount;
 
-        [SerializeField]
+        [SerializeField, Min(1)]
         private int currentWaveNumber;
         public int WaveNumber => currentWaveNumber;
 
