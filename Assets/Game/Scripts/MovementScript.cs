@@ -25,6 +25,6 @@ public class MovementScript : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.AddForce(new Vector3(horizontalInput, 0, verticalInput) * movementSpeed);
+        rb.AddForce(new Vector3(horizontalInput, 0, verticalInput).normalized * movementSpeed);
     }
 }
