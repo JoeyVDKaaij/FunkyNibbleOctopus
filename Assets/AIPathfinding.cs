@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.AI;
 using Game.Items;
@@ -21,11 +20,9 @@ public class AIPathfinding : MonoBehaviour
     
     private NavMeshAgent agent = null;
 
-    
     [Inject]
-    private PlatesController plate;
-    
-    
+    private PlatesController _platesController;
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -34,7 +31,17 @@ public class AIPathfinding : MonoBehaviour
 
     private void Start()
     {
-        dishes = plate.CurrentPlates.ToArray();
+        dishes = _platesController.CurrentPlates.ToArray();
+    }
+
+    private void OnEnable ()
+    {
+        _platesController.OnPlateConsumed += OnPlateConsumed_GetNewFocusDish;
+    }
+
+    private void OnDisable ()
+    {
+        _platesController.OnPlateConsumed -= OnPlateConsumed_GetNewFocusDish;
     }
 
     // Update is called once per frame
@@ -76,4 +83,12 @@ public class AIPathfinding : MonoBehaviour
             _currentItem = item;
             _currentItem.SetParent(transform, new Vector3(0, 1.2f, 0));
         }
+
+    private void OnPlateConsumed_GetNewFocusDish(PlateController plate)
+    {
+        if (_platesController.CurrentPlates.IndexOf(plate) == focusDishId) {
+            dishes = _platesController.CurrentPlates.ToArray();
+            focusDishId = Random.Range(0, _platesController.CurrentPlates.Count);
+        }
+    }
 }
