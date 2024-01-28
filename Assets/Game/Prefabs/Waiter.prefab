@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3326078360665930087}
   - component: {fileID: 6272583854404484177}
   - component: {fileID: 130958091324712225}
+  - component: {fileID: 4765032496217986975}
   m_Layer: 0
   m_Name: Waiter
   m_TagString: Waiter
@@ -142,6 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6512c7bc370ec954f9d8d0f571df8473, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeout: 8
 --- !u!54 &130958091324712225
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -169,3 +171,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!135 &4765032496217986975
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6483793977132761033}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1.5
+  m_Center: {x: 0, y: 0, z: 0}

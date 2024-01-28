@@ -51,6 +51,7 @@ namespace Game
             }
         }
 
+        /*
         private void OnCollisionStay(Collision other)
         {
             if (!_isItemInteractionRequested)
@@ -67,6 +68,7 @@ namespace Game
             }
 
         }
+        */
 
         private void OnTriggerStay (Collider other)
         {

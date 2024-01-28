@@ -9,7 +9,7 @@ using Zenject;
 namespace Game
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    public class AIPathfinding : MonoBehaviour
+    public class AIPathfinding : MonoBehaviour, IItemProvider
     {
         [SerializeField]
         private float timeout = 8f;
@@ -130,17 +130,28 @@ namespace Game
             }
         }
 
-        public IItem CurrentPlate
+        public bool IsItemAvailable (object requester)
         {
-            get { return _currentItem; }
+            return _currentItem != null;
         }
 
-        public void RemovePlate()
+        public IItem GetItem (object requester)
         {
+            if (_currentItem == null)
+                return null;
+
+            var item = _currentItem;
             _currentItem = null;
             _tablesController.FreeTable(_reservedTable);
             _reservedTable = null;
             _desiredPlate = null;
+
+            _allowedInteractionMoment = float.NegativeInfinity;
+            _nextTimeTimeout = float.NegativeInfinity;
+
+            agent.SetDestination(transform.position);
+
+            return item;
         }
     }
 }
