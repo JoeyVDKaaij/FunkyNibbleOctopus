@@ -41,9 +41,18 @@ namespace Game
 
         private void OnEnable ()
         {
+            _wavesController.OnWaveCompleted += OnWaveCompleted_RenewPlates;
             _wavesController.OnAllWavesCompleted += OnAllWavesCompleted_FinishGame;
             _platesController.OnPlateConsumed += OnPlateConsumed_AddScore;
             _platesController.OnAllPlatesConsumed += OnAllPlatesConsumed_NextWave;
+        }
+        
+        private void OnDisable ()
+        {
+            _wavesController.OnWaveCompleted -= OnWaveCompleted_RenewPlates;
+            _wavesController.OnAllWavesCompleted -= OnAllWavesCompleted_FinishGame;
+            _platesController.OnPlateConsumed -= OnPlateConsumed_AddScore;
+            _platesController.OnAllPlatesConsumed -= OnAllPlatesConsumed_NextWave;
         }
 
         private void Update ()
@@ -63,6 +72,11 @@ namespace Game
             if (Input.GetKeyDown(KeyCode.N))
                 _wavesController.NextWave();
 #endif
+        }
+
+        private void OnWaveCompleted_RenewPlates (int waveNumber)
+        {
+            _platesController.RenewPlates();
         }
 
         private void OnAllWavesCompleted_FinishGame ()

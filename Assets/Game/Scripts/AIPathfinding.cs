@@ -12,7 +12,7 @@ namespace Game
     public class AIPathfinding : MonoBehaviour
     {
         [SerializeField]
-        private float timeout = 4f;
+        private float timeout = 8f;
 
         private PlateController _desiredPlate;
         private TableController _reservedTable;
