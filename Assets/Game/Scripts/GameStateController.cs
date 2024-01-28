@@ -1,5 +1,6 @@
 ﻿using System;
 using Game.Plates;
+using Game.Tables;
 using UnityEngine;
 using Zenject;
 
@@ -7,7 +8,7 @@ namespace Game
 {
     public class GameStateController : MonoInstaller
     {
-        public event Action<float, float> OnScoreChanged; 
+        public event Action<float, float> OnScoreChanged;
 
         [Inject]
         private GameManager _gameManager;
@@ -20,12 +21,20 @@ namespace Game
 
         [SerializeField]
         private float score;
-
         public float Score
         {
             get => score;
             private set => score = value;
         }
+
+        [SerializeField, Min(0)]
+        private float scoreLossRatePerSecond;
+
+        [SerializeField, Min(0)]
+        private float scoreLossPerCustomerPerCorrectDelivery;
+
+        [SerializeField, Min(0)]
+        private float scoreGainPerCustomerPerIncorrectDelivery;
 
         public override void InstallBindings ()
         {
@@ -67,11 +76,12 @@ namespace Game
                     }
                 }
                 if (plate != null)
-                    _ = _platesController.ConsumePlate(0, plate);
+                    _ = _platesController.ConsumePlate(0, plate, Plate.Invalid);
             }
             if (Input.GetKeyDown(KeyCode.N))
                 _wavesController.NextWave();
 #endif
+            score -= scoreLossRatePerSecond * Time.deltaTime;
         }
 
         private void OnWaveCompleted_RenewPlates (int waveNumber)
@@ -85,11 +95,17 @@ namespace Game
             _gameManager.FinishGame(score);
         }
 
-        private void OnPlateConsumed_AddScore (int customersCount, PlateController plate)
+        private void OnPlateConsumed_AddScore (int customersCount, PlateController plate, Plate expectedPlate)
         {
-            // TODO: add proper score calculation
+            if (plate == null)
+                return;
+
             float previousScore = score;
-            score += 100;
+            if (expectedPlate.Type != plate.Plate.Type)
+                score += scoreGainPerCustomerPerIncorrectDelivery * customersCount;
+            else
+                score -= scoreLossPerCustomerPerCorrectDelivery * customersCount;
+
             OnScoreChanged?.Invoke(previousScore, score);
         }
 

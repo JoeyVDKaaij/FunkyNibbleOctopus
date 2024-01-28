@@ -14,7 +14,7 @@ namespace Game
         private Transform _childObject;
         private bool _isItemInteractionRequested;
         
-
+        [SerializeField]
         private AudioSource audioSource;
 
         [SerializeField]
