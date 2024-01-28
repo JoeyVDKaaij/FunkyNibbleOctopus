@@ -5,6 +5,9 @@ namespace Game
 {
     public class ItemInteractionScript : MonoBehaviour
     {
+        [SerializeField]
+        private Transform itemPivot;
+        
         private IItem _currentItem;
 
         private Transform _childObject;
@@ -96,7 +99,10 @@ namespace Game
         private void HoldItem (IItem item)
         {
             _currentItem = item;
-            _currentItem.SetParent(transform, new Vector3(0, 1.2f, 0));
+            if (itemPivot == null)
+                _currentItem.SetParent(transform, new Vector3(0, 1.2f, 0));
+            else
+                _currentItem.SetParent(itemPivot, Vector3.zero);
         }
     }
 }
