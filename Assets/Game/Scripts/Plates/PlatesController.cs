@@ -7,7 +7,7 @@ namespace Game.Plates
 {
     public class PlatesController : MonoInstaller
     {
-        public event Action<PlateController> OnPlateConsumed;
+        public event Action<int, PlateController> OnPlateConsumed;
 
         public event Action OnAllPlatesConsumed;
 
@@ -65,7 +65,7 @@ namespace Game.Plates
             CurrentPlates.Add(plate);
         }
 
-        public bool ConsumePlate (PlateController plate)
+        public bool ConsumePlate (int customerCount, PlateController plate)
         {
             if (plate == null || CurrentPlates == null || CurrentPlates.Count == 0)
                 return false;
@@ -76,7 +76,7 @@ namespace Game.Plates
 
             CurrentPlates.RemoveAt(index);
 
-            OnPlateConsumed?.Invoke(plate);
+            OnPlateConsumed?.Invoke(customerCount, plate);
             if (CurrentPlates.Count == 0)
                 OnAllPlatesConsumed?.Invoke();
 

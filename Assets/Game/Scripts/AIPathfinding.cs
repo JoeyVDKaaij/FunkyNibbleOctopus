@@ -1,85 +1,81 @@
-using UnityEngine;
-using UnityEngine.AI;
 using Game.Items;
 using Game.Plates;
 using Game.Tables;
+using UnityEngine;
+using UnityEngine.AI;
 using Zenject;
-using Random = UnityEngine.Random;
 
-[RequireComponent(typeof(NavMeshAgent))]
-public class AIPathfinding : MonoBehaviour
+namespace Game
 {
-    [Header("AI Pathfinding Settings")] [SerializeField, Tooltip("The tables that this GameObject has to pay attention to.")]
-    private Transform[] tables = null;
-    [SerializeField, Tooltip("The dishes that this GameObject has to pay attention to.")]
-    private PlateController[] dishes = null;
-
-    private int focusDishId = 0;
-    private IItem _currentItem;
-    private bool _isItemInteractionRequested = true;
-    private Transform _childObject;
-    private float interactionDelay = 2;
-    private float timer;
-    
-    private NavMeshAgent agent = null;
-
-    [Inject]
-    private PlatesController _platesController;
-
-    void Awake()
+    [RequireComponent(typeof(NavMeshAgent))]
+    public class AIPathfinding : MonoBehaviour
     {
-        agent = GetComponent<NavMeshAgent>();
-        focusDishId = Random.Range(0, dishes.Length);
-    }
+        private PlateController _desiredPlate;
+        private TableController _reservedTable;
 
-    private void Start()
-    {
-        dishes = _platesController.CurrentPlates.ToArray();
-    }
+        private IItem _currentItem;
 
-    private void OnEnable ()
-    {
-        _platesController.OnPlateConsumed += OnPlateConsumed_GetNewFocusDish;
-    }
+        private NavMeshAgent agent = null;
 
-    private void OnDisable ()
-    {
-        _platesController.OnPlateConsumed -= OnPlateConsumed_GetNewFocusDish;
-    }
+        [Inject]
+        private PlatesController _platesController;
 
-    // Update is called once per frame
-    private void Update() 
-    {
-        if (_currentItem == null)
+        [Inject]
+        private TablesController _tablesController;
+
+        private float _allowedInteractionMoment;
+
+        private void Awake()
         {
-                agent.SetDestination(dishes[focusDishId].transform.position);
+            agent = GetComponent<NavMeshAgent>();
         }
-        else
+
+        private void OnEnable ()
         {
-            foreach (Transform table in tables)
+            _platesController.OnPlateConsumed += OnPlateConsumed_GetNewFocusDish;
+        }
+
+        private void OnDisable ()
+        {
+            _platesController.OnPlateConsumed -= OnPlateConsumed_GetNewFocusDish;
+        }
+
+        private void Update()
+        {
+            if (_desiredPlate == null)
             {
-                if (table.GetComponent<TableController>().IsItemAcceptable(this, _currentItem))
-                    agent.SetDestination(table.transform.position);
+                if (_platesController.CurrentPlates.Count == 0) {
+                    agent.SetDestination(transform.position);
+
+                    return;
+                }
+
+                _reservedTable = _tablesController.ReserveTable(_platesController.CurrentPlates);
+                if (_reservedTable == null) {
+                    agent.SetDestination(transform.position);
+
+                    return;
+                }
+
+                foreach (var plate in _platesController.CurrentPlates)
+                    if (plate.Plate.Type == _reservedTable.DesiredPlate.Type)
+                    {
+                        _desiredPlate = plate;
+                        break;
+                    }
             }
+
+            Vector3 targetPosition = _currentItem == null
+                ? _desiredPlate.transform.position
+                : _reservedTable.transform.position;
+            agent.SetDestination(targetPosition);
         }
 
-        if (!_isItemInteractionRequested)
+        private void OnTriggerStay (Collider other)
         {
-            timer += Time.deltaTime;
-            if (timer >= interactionDelay)
-            {
-                _isItemInteractionRequested = true;
-                timer = 0;
-            }
-        }
-    }
-
-    
-    private void OnTriggerStay (Collider other)
-        {
-            if (!_isItemInteractionRequested) 
+            if (Time.time < _allowedInteractionMoment)
                 return;
-            
+
             if (_currentItem == null && other.TryGetComponent<IItemProvider>(out var itemProvider)) {
                 var item = itemProvider.GetItem(this);
                 if (item != null)
@@ -89,12 +85,13 @@ public class AIPathfinding : MonoBehaviour
                 {
                     _ = itemAcceptor.AcceptItem(this, _currentItem);
                     _currentItem = null;
-                    dishes = _platesController.CurrentPlates.ToArray();
-                    focusDishId = Random.Range(0, dishes.Length);
+                    _tablesController.FreeTable(_reservedTable);
+                    _reservedTable = null;
+                    _desiredPlate = null;
                 }
             }
 
-            _isItemInteractionRequested = false;
+            _allowedInteractionMoment = Time.time + 2f /* seconds in the future */;
         }
 
         private void HoldItem (IItem item)
@@ -103,11 +100,13 @@ public class AIPathfinding : MonoBehaviour
             _currentItem.SetParent(transform, new Vector3(0, 1.2f, 0));
         }
 
-    private void OnPlateConsumed_GetNewFocusDish(PlateController plate)
-    {
-        if (_platesController.CurrentPlates.IndexOf(plate) == focusDishId) {
-            dishes = _platesController.CurrentPlates.ToArray();
-            focusDishId = Random.Range(0, _platesController.CurrentPlates.Count);
+        private void OnPlateConsumed_GetNewFocusDish(int customersCount, PlateController plate)
+        {
+            if (plate == _desiredPlate) {
+                _tablesController.FreeTable(_reservedTable);
+                _reservedTable = null;
+                _desiredPlate = null;
+            }
         }
     }
 }

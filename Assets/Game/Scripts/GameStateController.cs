@@ -58,7 +58,7 @@ namespace Game
                     }
                 }
                 if (plate != null)
-                    _ = _platesController.ConsumePlate(plate);
+                    _ = _platesController.ConsumePlate(0, plate);
             }
             if (Input.GetKeyDown(KeyCode.N))
                 _wavesController.NextWave();
@@ -71,7 +71,7 @@ namespace Game
             _gameManager.FinishGame(score);
         }
 
-        private void OnPlateConsumed_AddScore (PlateController plate)
+        private void OnPlateConsumed_AddScore (int customersCount, PlateController plate)
         {
             // TODO: add proper score calculation
             float previousScore = score;
