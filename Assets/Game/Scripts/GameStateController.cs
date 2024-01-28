@@ -1,4 +1,5 @@
-﻿using Game.Plates;
+﻿using System;
+using Game.Plates;
 using UnityEngine;
 using Zenject;
 
@@ -6,6 +7,8 @@ namespace Game
 {
     public class GameStateController : MonoInstaller
     {
+        public event Action<float, float> OnScoreChanged; 
+
         [Inject]
         private GameManager _gameManager;
 
@@ -71,7 +74,9 @@ namespace Game
         private void OnPlateConsumed_AddScore (PlateController plate)
         {
             // TODO: add proper score calculation
+            float previousScore = score;
             score += 100;
+            OnScoreChanged?.Invoke(previousScore, score);
         }
 
         private void OnAllPlatesConsumed_NextWave ()
