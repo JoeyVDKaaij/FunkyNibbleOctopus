@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Game.Items;
 using Game.Plates;
 using Game.Tables;
@@ -10,6 +11,9 @@ namespace Game
     [RequireComponent(typeof(NavMeshAgent))]
     public class AIPathfinding : MonoBehaviour
     {
+        [SerializeField]
+        private float timeout = 4f;
+
         private PlateController _desiredPlate;
         private TableController _reservedTable;
 
@@ -24,6 +28,8 @@ namespace Game
         private TablesController _tablesController;
 
         private float _allowedInteractionMoment;
+
+        private float _nextTimeTimeout;
 
         private void Awake()
         {
@@ -50,7 +56,12 @@ namespace Game
                     return;
                 }
 
-                _reservedTable = _tablesController.ReserveTable(_platesController.CurrentPlates);
+                List<PlateController> plates;
+                if (_currentItem == null)
+                    plates = _platesController.CurrentPlates;
+                else
+                    plates = new List<PlateController> { _currentItem as PlateController };
+                _reservedTable = _tablesController.ReserveTable(plates);
                 if (_reservedTable == null) {
                     agent.SetDestination(transform.position);
 
@@ -68,7 +79,17 @@ namespace Game
             Vector3 targetPosition = _currentItem == null
                 ? _desiredPlate.transform.position
                 : _reservedTable.transform.position;
-            agent.SetDestination(targetPosition);
+            if (agent.destination == targetPosition && Time.time > _nextTimeTimeout) {
+                // TODO: consider if it makes sense to ever get rid of the attached food
+                if (_currentItem != null) {
+                    _tablesController.FreeTable(_reservedTable);
+                    _reservedTable = null;
+                    _desiredPlate = null;
+                }
+            } else if (agent.destination != targetPosition)
+                agent.SetDestination(targetPosition);
+
+            _nextTimeTimeout = Time.time + timeout;
         }
 
         private void OnTriggerStay (Collider other)
