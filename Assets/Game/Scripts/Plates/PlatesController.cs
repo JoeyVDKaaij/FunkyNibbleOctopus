@@ -11,7 +11,7 @@ namespace Game.Plates
 
         public event Action OnAllPlatesConsumed;
 
-        public delegate PlateController PlateSpawner (DiContainer container, string type);
+        public delegate List<PlateController> PlateSpawner (DiContainer container, int count);
 
         public event PlateSpawner SpawnPlate;
 
@@ -34,17 +34,8 @@ namespace Game.Plates
             if (CurrentPlates == null)
                 CurrentPlates = new List<PlateController>(platesCount);
 
-            for (int i = 0; i < CurrentPlates.Count; i++)
-                if (CurrentPlates[i] != null)
-                    Destroy(CurrentPlates[i].gameObject);
-
             CurrentPlates.Clear();
-            for (int i = 0; i < platesCount; i++) {
-                string type = _platesRepository.PlateContainers[UnityEngine.Random.Range(0, _platesRepository.PlateContainers.Length)].Type;
-                var plate = SpawnPlate?.Invoke(Container, type);
-                if (plate == null)
-                    CurrentPlates.Add(plate);
-            }
+            CurrentPlates = SpawnPlate?.Invoke(Container, platesCount);
         }
 
         public bool IsPlateConsumed (PlateController plate)
@@ -67,14 +58,12 @@ namespace Game.Plates
 
         public bool ConsumePlate (int customerCount, PlateController plate)
         {
-            if (plate == null || CurrentPlates == null || CurrentPlates.Count == 0)
+            if (plate == null)
                 return false;
 
             var index = CurrentPlates.IndexOf(plate);
-            if (index < 0)
-                return false;
-
-            CurrentPlates.RemoveAt(index);
+            if (index >= 0)
+                CurrentPlates.RemoveAt(index);
 
             OnPlateConsumed?.Invoke(customerCount, plate);
             if (CurrentPlates.Count == 0)

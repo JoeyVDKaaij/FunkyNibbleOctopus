@@ -26,6 +26,8 @@ namespace Game.Tables
         private Plate _desiredPlate;
         public Plate DesiredPlate => _desiredPlate;
 
+        private bool _consumingPlate = false;
+        
         private PlateController _currentPlate;
 
         private TableCustomer[] _customers;
@@ -47,7 +49,7 @@ namespace Game.Tables
 
         public bool IsItemAcceptable (object requester, IItem item)
         {
-            if (_currentPlate != null)
+            if (_currentPlate != null || _consumingPlate)
                 return false;
 
             if (requester is AIPathfinding && item is PlateController plate)
@@ -72,7 +74,7 @@ namespace Game.Tables
 
         public bool AcceptPlate (Vector3 position, PlateController plate)
         {
-            if (_currentPlate != null)
+            if (_currentPlate != null || _consumingPlate)
                 return false;
 
             _currentPlate = plate;
@@ -100,10 +102,12 @@ namespace Game.Tables
                     _customers[i].SignalHappy();
 
             _platesController.ConsumePlate(_customers.Length, _currentPlate);
+            _consumingPlate = true;
 
             await UniTask.Delay((int)(_tablesController.SecondsBetweenPlates * 1000));
 
             _currentPlate = null;
+            _consumingPlate = false;
 
             for (int i = 0; i < _customers.Length; i++)
                 _customers[i].SignalIdle();

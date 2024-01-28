@@ -37,6 +37,9 @@ namespace Game.Plates
         private PlatesController _platesController;
 
         [Inject]
+        private PlatesRepository _platesRepository;
+
+        [Inject]
         private PlatesPickupController _platesPickupController;
 
         private PlateSpawnPoint[] _spawnPoints;
@@ -64,6 +67,23 @@ namespace Game.Plates
         private void OnDisable ()
         {
             _platesController.SpawnPlate -= Spawn;
+        }
+
+        public List<PlateController> Spawn (DiContainer container, int count)
+        {
+            List<PlateController> plates = new(count);
+            for (int i = 0; i < _spawnPoints.Length; i++)
+                if (_spawnPoints[i].Plate != null)
+                    plates.Add(_spawnPoints[i].Plate);
+            for (int i = 0; i < count; i++) {
+                string type = _platesRepository.PlateContainers[Random.Range(0, _platesRepository.PlateContainers.Length)].Type;
+                var plate = Spawn(container, type);
+                if (plate == null)
+                    break;
+                plates.Add(plate);
+            }
+
+            return plates;
         }
 
         public PlateController Spawn (DiContainer container, string type)

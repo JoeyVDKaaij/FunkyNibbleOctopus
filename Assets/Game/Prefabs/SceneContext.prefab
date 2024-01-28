@@ -204,5 +204,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f21b36e6afdd441f9ab420ced4f4bf74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maximumWaveDuration: 20
   maximumWaveCount: 10
   currentWaveNumber: 1
