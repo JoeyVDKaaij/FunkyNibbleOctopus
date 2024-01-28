@@ -1,3 +1,4 @@
+using System;
 using Game.Waves;
 using TMPro;
 using UnityEngine;
@@ -12,6 +13,11 @@ namespace Game.UI
 
         [Inject]
         private WavesController _wavesController;
+
+        private void Start ()
+        {
+            text.text = _wavesController.WaveNumber.ToString("D2") + "/" + _wavesController.MaximumWaveCount.ToString("D2");
+        }
 
         private void OnEnable ()
         {
