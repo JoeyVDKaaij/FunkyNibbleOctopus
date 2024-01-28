@@ -1,10 +1,14 @@
 using UnityEngine;
+using UnityEngine.AI;
 using Zenject;
 
 namespace Game.Character
 {
     public class CharacterFlipper : MonoBehaviour
     {
+        [SerializeField]
+        private NavMeshAgent agent;
+        
         [SerializeField]
         private new Rigidbody rigidbody;
         
@@ -28,7 +32,8 @@ namespace Game.Character
             if (flip)
                 cameraForward = -cameraForward;
 
-            float v = Vector3.Dot(rigidbody.velocity, _camera.transform.right);
+            Vector3 velocity = agent ? agent.velocity : rigidbody.velocity;
+            float v = Vector3.Dot(velocity, _camera.transform.right);
             if (v > 0.01f)
                 _reverseForward = true;
             else if (v < -0.01f)
