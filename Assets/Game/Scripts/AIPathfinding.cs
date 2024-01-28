@@ -31,9 +31,18 @@ namespace Game
 
         private float _nextTimeTimeout;
 
+        private AudioSource audioSource;
+
+        [SerializeField]
+        private AudioClip pickUpPlateClip = null;
+
+        [SerializeField]
+        private AudioClip dropPlateClip = null;
+
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
+            audioSource = GetComponent<AudioSource>();
         }
 
         private void OnEnable ()
@@ -52,6 +61,7 @@ namespace Game
             {
                 if (_platesController.CurrentPlates.Count == 0) {
                     agent.SetDestination(transform.position);
+                    if (audioSource != null && !audioSource.isPlaying) audioSource.Play();
 
                     return;
                 }
@@ -64,7 +74,8 @@ namespace Game
                 _reservedTable = _tablesController.ReserveTable(plates);
                 if (_reservedTable == null) {
                     agent.SetDestination(transform.position);
-
+                    if (audioSource != null && !audioSource.isPlaying) audioSource.Play();
+                    
                     return;
                 }
 
@@ -87,7 +98,10 @@ namespace Game
                     _desiredPlate = null;
                 }
             } else if (agent.destination != targetPosition)
+            {
                 agent.SetDestination(targetPosition);
+                if (audioSource != null && !audioSource.isPlaying) audioSource.Play();
+            }
 
             _nextTimeTimeout = Time.time + timeout;
         }
@@ -100,7 +114,10 @@ namespace Game
             if (_currentItem == null && other.TryGetComponent<IItemProvider>(out var itemProvider)) {
                 var item = itemProvider.GetItem(this);
                 if (item != null)
+                {
                     HoldItem(item);
+                    if (pickUpPlateClip != null) audioSource.PlayOneShot(pickUpPlateClip, 1f);   
+                }
             } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
                 if (itemAcceptor.IsItemAcceptable(this, _currentItem))
                 {
@@ -109,6 +126,7 @@ namespace Game
                     _tablesController.FreeTable(_reservedTable);
                     _reservedTable = null;
                     _desiredPlate = null;
+                    if (dropPlateClip != null) audioSource.PlayOneShot(dropPlateClip, 1f);   
                 }
             }
 

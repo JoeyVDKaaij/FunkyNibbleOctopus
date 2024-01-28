@@ -13,6 +13,15 @@ namespace Game
 
         private Transform _childObject;
         private bool _isItemInteractionRequested;
+        
+
+        private AudioSource audioSource;
+
+        [SerializeField]
+        private AudioClip pickUpPlateClip = null;
+
+        [SerializeField]
+        private AudioClip dropPlateClip = null;
 
         private void Update()
         {
@@ -76,12 +85,16 @@ namespace Game
             if (_currentItem == null && other.TryGetComponent<IItemProvider>(out var itemProvider)) {
                 var item = itemProvider.GetItem(this);
                 if (item != null)
+                {
                     HoldItem(item);
+                    if (pickUpPlateClip != null) audioSource.PlayOneShot(pickUpPlateClip, 1f);
+                }
             } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
                 if (itemAcceptor.IsItemAcceptable(this, _currentItem))
                 {
                     _ = itemAcceptor.AcceptItem(this, _currentItem);
                     _currentItem = null;
+                    if (dropPlateClip != null) audioSource.PlayOneShot(dropPlateClip, 1f);   
                 }
             }
 
