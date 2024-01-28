@@ -17,6 +17,8 @@ namespace Game
         private PlateController _desiredPlate;
         private TableController _reservedTable;
 
+        [SerializeField]
+        private Transform _itemPivot;
         private IItem _currentItem;
 
         private NavMeshAgent agent = null;
@@ -55,10 +57,9 @@ namespace Game
             _platesController.OnPlateConsumed -= OnPlateConsumed_GetNewFocusDish;
         }
 
-        private void Update()
+        private void Update ()
         {
-            if (_desiredPlate == null)
-            {
+            if (_desiredPlate == null) {
                 if (_platesController.CurrentPlates.Count == 0) {
                     agent.SetDestination(transform.position);
                     if (audioSource != null && !audioSource.isPlaying) audioSource.Play();
@@ -75,13 +76,12 @@ namespace Game
                 if (_reservedTable == null) {
                     agent.SetDestination(transform.position);
                     if (audioSource != null && !audioSource.isPlaying) audioSource.Play();
-                    
+
                     return;
                 }
 
                 foreach (var plate in _platesController.CurrentPlates)
-                    if (plate.Plate.Type == _reservedTable.DesiredPlate.Type)
-                    {
+                    if (plate.Plate.Type == _reservedTable.DesiredPlate.Type) {
                         _desiredPlate = plate;
                         break;
                     }
@@ -92,7 +92,7 @@ namespace Game
                 : _reservedTable.transform.position;
             if (NavMesh.SamplePosition(targetPosition, out var hit, 100f, NavMesh.AllAreas))
                 targetPosition = hit.position;
-            if (Vector3.SqrMagnitude(agent.destination - targetPosition) < 0.1f) {
+            if (Vector3.SqrMagnitude(agent.destination - targetPosition) < 0.2f) {
                 if (Time.time > _nextTimeTimeout) {
                     // TODO: consider if it makes sense to ever get rid of the attached food
                     if (_currentItem != null) {
@@ -126,7 +126,7 @@ namespace Game
                     interactionOccured = true;
                     if (pickUpPlateClip != null) audioSource.PlayOneShot(pickUpPlateClip, 1f);  
                 }
-           } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
+            } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
                 if (itemAcceptor.IsItemAcceptable(this, _currentItem))
                 {
                     _ = itemAcceptor.AcceptItem(this, _currentItem);
@@ -146,7 +146,7 @@ namespace Game
         private void HoldItem (IItem item)
         {
             _currentItem = item;
-            _currentItem.SetParent(transform, new Vector3(0, 1.2f, 0));
+            _currentItem.SetParent(_itemPivot, Vector3.zero);
         }
 
         private void OnPlateConsumed_GetNewFocusDish(int customersCount, PlateController plate, Plate expectedPlate)
