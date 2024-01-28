@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 130958091324712225}
   m_Layer: 0
   m_Name: Waiter
-  m_TagString: Untagged
+  m_TagString: Waiter
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

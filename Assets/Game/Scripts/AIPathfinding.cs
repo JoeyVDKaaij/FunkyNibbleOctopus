@@ -108,5 +108,18 @@ namespace Game
                 _desiredPlate = null;
             }
         }
+
+        public IItem CurrentPlate
+        {
+            get { return _currentItem; }
+        }
+
+        public void RemovePlate()
+        {
+            _currentItem = null;
+            _tablesController.FreeTable(_reservedTable);
+            _reservedTable = null;
+            _desiredPlate = null;
+        }
     }
 }

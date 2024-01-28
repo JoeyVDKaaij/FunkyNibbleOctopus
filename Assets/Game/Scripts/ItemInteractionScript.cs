@@ -1,3 +1,4 @@
+using System;
 using Game.Items;
 using UnityEngine;
 
@@ -48,6 +49,23 @@ namespace Game
                     _isItemInteractionRequested = true;
                 }
             }
+        }
+
+        private void OnCollisionStay(Collision other)
+        {
+            if (!_isItemInteractionRequested)
+                return;
+
+            if (_currentItem == null && other.gameObject.GetComponent<AIPathfinding>().CurrentPlate != null)
+            {
+                    var item = other.gameObject.GetComponent<AIPathfinding>().CurrentPlate;
+                    if (item != null)
+                    {
+                        HoldItem(item);
+                        other.gameObject.GetComponent<AIPathfinding>().RemovePlate();
+                    }
+            }
+
         }
 
         private void OnTriggerStay (Collider other)
