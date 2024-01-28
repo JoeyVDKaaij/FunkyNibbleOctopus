@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Game.Items;
 using Game.Plates;
+using Game.Tables;
 using Zenject;
 using Random = UnityEngine.Random;
 
@@ -17,6 +18,8 @@ public class AIPathfinding : MonoBehaviour
     private IItem _currentItem;
     private bool _isItemInteractionRequested = true;
     private Transform _childObject;
+    private float interactionDelay = 2;
+    private float timer;
     
     private NavMeshAgent agent = null;
 
@@ -45,15 +48,29 @@ public class AIPathfinding : MonoBehaviour
     }
 
     // Update is called once per frame
-    private void Update()
+    private void Update() 
     {
         if (_currentItem == null)
         {
-            agent.SetDestination(dishes[focusDishId].transform.position);
+                agent.SetDestination(dishes[focusDishId].transform.position);
         }
         else
         {
-            agent.SetDestination(tables[0].transform.position);
+            foreach (Transform table in tables)
+            {
+                if (table.GetComponent<TableController>().IsItemAcceptable(this, _currentItem))
+                    agent.SetDestination(table.transform.position);
+            }
+        }
+
+        if (!_isItemInteractionRequested)
+        {
+            timer += Time.deltaTime;
+            if (timer >= interactionDelay)
+            {
+                _isItemInteractionRequested = true;
+                timer = 0;
+            }
         }
     }
 
@@ -64,14 +81,16 @@ public class AIPathfinding : MonoBehaviour
                 return;
             
             if (_currentItem == null && other.TryGetComponent<IItemProvider>(out var itemProvider)) {
-                var item = itemProvider.GetItem(transform.position);
+                var item = itemProvider.GetItem(this);
                 if (item != null)
                     HoldItem(item);
             } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
-                if (itemAcceptor.IsItemAcceptable(transform.position, _currentItem))
+                if (itemAcceptor.IsItemAcceptable(this, _currentItem))
                 {
-                    _ = itemAcceptor.AcceptItem(transform.position, _currentItem);
+                    _ = itemAcceptor.AcceptItem(this, _currentItem);
                     _currentItem = null;
+                    dishes = _platesController.CurrentPlates.ToArray();
+                    focusDishId = Random.Range(0, dishes.Length);
                 }
             }
 
