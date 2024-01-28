@@ -6,10 +6,13 @@ namespace Game.Waves
 {
     public class WavesController : MonoInstaller
     {
-        public Action OnAllWavesCompleted;
+        public event Action<int> OnWaveCompleted;
+
+        public event Action OnAllWavesCompleted;
 
         [SerializeField]
         private int maximumWaveCount;
+        public int MaximumWaveCount => maximumWaveCount;
 
         [SerializeField, Min(1)]
         private int currentWaveNumber;
@@ -23,6 +26,7 @@ namespace Game.Waves
         public void NextWave ()
         {
             currentWaveNumber++;
+            OnWaveCompleted?.Invoke(currentWaveNumber);
             if (currentWaveNumber > maximumWaveCount)
                 OnAllWavesCompleted?.Invoke();
         }
