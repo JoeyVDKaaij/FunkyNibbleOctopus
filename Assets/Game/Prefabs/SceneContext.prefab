@@ -160,6 +160,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   score: 0
+  scoreLossRatePerSecond: 3.1415927
+  scoreLossPerCustomerPerCorrectDelivery: 35.5
+  scoreGainPerCustomerPerIncorrectDelivery: 71
 --- !u!1 &5624964745234662160
 GameObject:
   m_ObjectHideFlags: 0

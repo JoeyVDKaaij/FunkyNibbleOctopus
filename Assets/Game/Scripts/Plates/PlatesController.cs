@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Game.Tables;
 using UnityEngine;
 using Zenject;
 
@@ -7,7 +8,7 @@ namespace Game.Plates
 {
     public class PlatesController : MonoInstaller
     {
-        public event Action<int, PlateController> OnPlateConsumed;
+        public event Action<int, PlateController, Plate> OnPlateConsumed;
 
         public event Action OnAllPlatesConsumed;
 
@@ -56,7 +57,7 @@ namespace Game.Plates
             CurrentPlates.Add(plate);
         }
 
-        public bool ConsumePlate (int customerCount, PlateController plate)
+        public bool ConsumePlate (int customerCount, PlateController plate, Plate expectedPlate)
         {
             if (plate == null)
                 return false;
@@ -65,7 +66,7 @@ namespace Game.Plates
             if (index >= 0)
                 CurrentPlates.RemoveAt(index);
 
-            OnPlateConsumed?.Invoke(customerCount, plate);
+            OnPlateConsumed?.Invoke(customerCount, plate, expectedPlate);
             if (CurrentPlates.Count == 0)
                 OnAllPlatesConsumed?.Invoke();
 

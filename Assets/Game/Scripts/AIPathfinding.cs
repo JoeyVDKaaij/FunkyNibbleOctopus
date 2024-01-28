@@ -90,20 +90,27 @@ namespace Game
             Vector3 targetPosition = _currentItem == null
                 ? _desiredPlate.transform.position
                 : _reservedTable.transform.position;
-            if (agent.destination == targetPosition && Time.time > _nextTimeTimeout) {
-                // TODO: consider if it makes sense to ever get rid of the attached food
-                if (_currentItem != null) {
-                    _tablesController.FreeTable(_reservedTable);
-                    _reservedTable = null;
-                    _desiredPlate = null;
+            if (NavMesh.SamplePosition(targetPosition, out var hit, 100f, NavMesh.AllAreas))
+                targetPosition = hit.position;
+            if (Vector3.SqrMagnitude(agent.destination - targetPosition) < 0.1f) {
+                if (Time.time > _nextTimeTimeout) {
+                    // TODO: consider if it makes sense to ever get rid of the attached food
+                    if (_currentItem != null) {
+                        _tablesController.FreeTable(_reservedTable);
+                        _reservedTable = null;
+                        _desiredPlate = null;
+
+                        agent.SetDestination(transform.position);
+                    }
+
+                    _nextTimeTimeout = Time.time + timeout;
                 }
-            } else if (agent.destination != targetPosition)
-            {
+            } else {
                 agent.SetDestination(targetPosition);
                 if (audioSource != null && !audioSource.isPlaying) audioSource.Play();
-            }
 
-            _nextTimeTimeout = Time.time + timeout;
+                _nextTimeTimeout = Time.time + timeout;
+            }
         }
 
         private void OnTriggerStay (Collider other)
@@ -111,14 +118,15 @@ namespace Game
             if (Time.time < _allowedInteractionMoment)
                 return;
 
+            bool interactionOccured = false;
             if (_currentItem == null && other.TryGetComponent<IItemProvider>(out var itemProvider)) {
                 var item = itemProvider.GetItem(this);
-                if (item != null)
-                {
+                if (item != null) {
                     HoldItem(item);
-                    if (pickUpPlateClip != null) audioSource.PlayOneShot(pickUpPlateClip, 1f);   
+                    interactionOccured = true;
+                    if (pickUpPlateClip != null) audioSource.PlayOneShot(pickUpPlateClip, 1f);  
                 }
-            } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
+           } else if (_currentItem != null && other.TryGetComponent<IItemAcceptor>(out var itemAcceptor)) {
                 if (itemAcceptor.IsItemAcceptable(this, _currentItem))
                 {
                     _ = itemAcceptor.AcceptItem(this, _currentItem);
@@ -126,11 +134,13 @@ namespace Game
                     _tablesController.FreeTable(_reservedTable);
                     _reservedTable = null;
                     _desiredPlate = null;
-                    if (dropPlateClip != null) audioSource.PlayOneShot(dropPlateClip, 1f);   
+                    interactionOccured = true;
+                    if (dropPlateClip != null) audioSource.PlayOneShot(dropPlateClip, 1f);
                 }
             }
 
-            _allowedInteractionMoment = Time.time + 2f /* seconds in the future */;
+            if (interactionOccured)
+                _allowedInteractionMoment = Time.time + 2f /* seconds in the future */;
         }
 
         private void HoldItem (IItem item)
@@ -139,7 +149,7 @@ namespace Game
             _currentItem.SetParent(transform, new Vector3(0, 1.2f, 0));
         }
 
-        private void OnPlateConsumed_GetNewFocusDish(int customersCount, PlateController plate)
+        private void OnPlateConsumed_GetNewFocusDish(int customersCount, PlateController plate, Plate expectedPlate)
         {
             if (plate == _desiredPlate) {
                 _tablesController.FreeTable(_reservedTable);

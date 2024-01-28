@@ -88,20 +88,20 @@ namespace Game.Tables
         private async UniTaskVoid ConsumePlate ()
         {
             tableDisplay.Hide();
-            
-            var desiredPlateType = _desiredPlate.Type;
+
+            var desiredPlate = _desiredPlate;
             _desiredPlate = Plate.Invalid;
 
             await UniTask.Delay((int)(_tablesController.SecondsToConsume * 1000));
-            
-            if (_currentPlate.Plate.Type != desiredPlateType)
+
+            if (_currentPlate.Plate.Type != desiredPlate.Type)
                 for (int i = 0; i < _customers.Length; i++)
                     _customers[i].SignalAngry();
             else
                 for (int i = 0; i < _customers.Length; i++)
                     _customers[i].SignalHappy();
 
-            _platesController.ConsumePlate(_customers.Length, _currentPlate);
+            _platesController.ConsumePlate(_customers.Length, _currentPlate, desiredPlate);
             _consumingPlate = true;
 
             await UniTask.Delay((int)(_tablesController.SecondsBetweenPlates * 1000));
