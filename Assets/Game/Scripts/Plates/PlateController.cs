@@ -24,6 +24,7 @@ namespace Game.Plates
         {
             transform.SetParent(parent);
             transform.localPosition = offset;
+            transform.localRotation = Quaternion.identity;
         }
     }
 }

@@ -11,13 +11,25 @@ namespace Game.Tables
         [SerializeField]
         private Transform platePivot;
 
-        [SerializeField, Range(0, 10)]
-        private float secondsToConsume = 1f;
+        [SerializeField]
+        private TableDisplay tableDisplay;
 
         [Inject]
         private PlatesController _platesController;
 
+        [Inject]
+        private TablesController _tablesController;
+
+        private Plate _desiredPlate;
+
         private PlateController _currentPlate;
+
+        private void Start ()
+        {
+            _desiredPlate = _tablesController.RequestPlate();
+
+            tableDisplay.ShowPlate(_desiredPlate.Type);
+        }
 
         public void ClearCurrentPlate ()
         {
@@ -27,12 +39,12 @@ namespace Game.Tables
 
         public bool IsItemAcceptable (object requester, IItem item)
         {
-            return _currentPlate == null && item is PlateController && requester is MonoBehaviour;
+            return _desiredPlate != Plate.Invalid && _currentPlate == null && item is PlateController && requester is MonoBehaviour;
         }
 
         public bool AcceptItem (object requester, IItem item)
         {
-            if (item is PlateController plate && requester is MonoBehaviour behaviour)
+            if ( _desiredPlate != Plate.Invalid && item is PlateController plate && requester is MonoBehaviour behaviour)
                 return AcceptPlate(behaviour.transform.position, plate);
 
             return false;
@@ -53,11 +65,19 @@ namespace Game.Tables
 
         private async UniTaskVoid ConsumePlate ()
         {
-            await UniTask.Delay((int)(secondsToConsume * 1000));
+            tableDisplay.Hide();
+            _desiredPlate = Plate.Invalid;
+
+            await UniTask.Delay((int)(_tablesController.SecondsToConsume * 1000));
 
             _platesController.ConsumePlate(_currentPlate);
-
             _currentPlate = null;
+
+            await UniTask.Delay((int)(_tablesController.SecondsBetweenPlates * 1000));
+
+            _desiredPlate = _tablesController.RequestPlate();
+
+            tableDisplay.ShowPlate(_desiredPlate.Type);
         }
     }
 }
