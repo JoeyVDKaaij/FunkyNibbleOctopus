@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f6bf7556-1412-4d6b-a103-d1b99599d70f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FunkyNibbleOctopus/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FunkyNibbleOctopus/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/AIPathfinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Game/Scripts/AIPathfinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/AIPathfinding.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Game/Scripts/AIPathfinding.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Game/Scenes/GameScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Game/Scripts/AIPathfinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Game/Scripts/AIPathfinding.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,6 +104,7 @@
       <workItem from="1706323280601" duration="9000000" />
       <workItem from="1706343105991" duration="12868000" />
       <workItem from="1706377736679" duration="3521000" />
+      <workItem from="1706384419538" duration="9859000" />
     </task>
     <servers />
   </component>
